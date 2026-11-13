@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
     <OutputType>Library</OutputType>
     <RootNamespace>FreeMote.Plugins</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -20,7 +20,7 @@
     <ProjectReference Include="..\FreeMote\FreeMote.csproj" />
   </ItemGroup>
 	<Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
     <PostBuildEvent>echo https://github.com/dotnet/project-system/issues/1569#issuecomment-289939906 
 xcopy "$(TargetDir.TrimEnd('\'))" "$(SolutionDir)FreeMote.Tools.PsbDecompile\$(OutDir)" /E /Y
 xcopy "$(TargetDir.TrimEnd('\'))" "$(SolutionDir)FreeMote.Tools.PsBuild\$(OutDir)" /E /Y

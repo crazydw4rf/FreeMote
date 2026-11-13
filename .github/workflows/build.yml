@@ -4,20 +4,32 @@ on:
   push:
     branches:
       - master
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  build:
+  build-windows:
+    name: Build (Windows)
     runs-on: windows-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
 
     - name: Restore NuGet packages
-      run: nuget restore FreeMote.sln
+      run: dotnet restore FreeMote.sln
 
     - name: Build solution
       run: dotnet build -c Release FreeMote.sln
@@ -40,7 +52,69 @@ jobs:
         Move-Item FreeMoteToolkit/x64 FreeMoteToolkit/lib/
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v4
       with:
-        name: FreeMote-${{ github.workflow }}-${{ github.run_number }}
+        name: FreeMote-Windows-${{ github.workflow }}-${{ github.run_number }}
         path: FreeMoteToolkit
+
+    - name: Archive Windows package
+      if: startsWith(github.ref, 'refs/tags/')
+      shell: pwsh
+      run: |
+        Compress-Archive -Path FreeMoteToolkit/* -DestinationPath FreeMote-Windows.zip
+
+    - name: Release to GitHub (Windows)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: FreeMote-Windows.zip
+
+  build-linux-x64:
+    name: Build (Linux amd64)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore NuGet packages
+      run: dotnet restore FreeMote.sln
+
+    - name: Build Plugins
+      run: |
+        dotnet build -c Release -f net8.0 FreeMote.Plugins/FreeMote.Plugins.csproj
+        dotnet build -c Release -f net8.0 FreeMote.Plugins.x64/FreeMote.Plugins.x64.csproj
+
+    - name: Publish Linux CLI Tools (amd64)
+      run: |
+        mkdir -p FreeMoteToolkit-Linux
+        dotnet publish -c Release -f net8.0 -r linux-x64 --self-contained true FreeMote.Tools.EmtConvert/FreeMote.Tools.EmtConvert.csproj -o ./FreeMoteToolkit-Linux
+        dotnet publish -c Release -f net8.0 -r linux-x64 --self-contained true FreeMote.Tools.PsbDecompile/FreeMote.Tools.PsbDecompile.csproj -o ./FreeMoteToolkit-Linux
+        dotnet publish -c Release -f net8.0 -r linux-x64 --self-contained true FreeMote.Tools.PsBuild/FreeMote.Tools.PsBuild.csproj -o ./FreeMoteToolkit-Linux
+        dotnet publish -c Release -f net8.0 -r linux-x64 --self-contained true FreeMote.Tools.EmtMake/FreeMote.Tools.EmtMake.csproj -o ./FreeMoteToolkit-Linux
+        cp FreeMote.Plugins/bin/Release/net8.0/FreeMote.Plugins.dll FreeMoteToolkit-Linux/
+        cp FreeMote.Plugins.x64/bin/Release/net8.0/FreeMote.Plugins.x64.dll FreeMoteToolkit-Linux/
+        rm -f FreeMoteToolkit-Linux/*.pdb FreeMoteToolkit-Linux/*.xml
+        chmod +x FreeMoteToolkit-Linux/EmtConvert FreeMoteToolkit-Linux/PsbDecompile FreeMoteToolkit-Linux/PsBuild FreeMoteToolkit-Linux/EmtMake
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: FreeMote-Linux-x64-${{ github.workflow }}-${{ github.run_number }}
+        path: FreeMoteToolkit-Linux
+
+    - name: Archive Linux package
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        tar -czvf FreeMote-Linux-x64.tar.gz -C FreeMoteToolkit-Linux .
+
+    - name: Release to GitHub (Linux)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        files: FreeMote-Linux-x64.tar.gz
