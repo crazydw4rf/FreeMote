@@ -626,7 +626,7 @@ namespace FreeMote.PsBuild
                 var extractedCount = 0;
                 var fileLength = new FileInfo(body).Length;
                 var suffixes = suffixList.OfType<PsbString>().Select(s => s.Value).DefaultIfEmpty("").ToArray();
-                using var mmFile = MemoryMappedFile.CreateFromFile(body, FileMode.Open, name, 0, MemoryMappedFileAccess.Read);
+                using var mmFile = MemoryMappedFile.CreateFromFile(body, FileMode.Open, null, 0, MemoryMappedFileAccess.Read);
 
                 void RecordFailure(string entry, long start, int len, string shellType,
                     List<string> candidates, string reason, byte[] rawBytes = null)
