@@ -54,7 +54,7 @@ jobs:
     - name: Archive Windows package
       shell: pwsh
       run: |
-        Compress-Archive -Path FreeMoteToolkit/* -DestinationPath FreeMote-Windows.zip
+        Compress-Archive -Path FreeMoteToolkit/* -DestinationPath FreeMote-Windows.zip -CompressionLevel Optimal
 
     - name: Upload artifact (Folder)
       uses: actions/upload-artifact@v4
@@ -98,7 +98,7 @@ jobs:
 
     - name: Archive Linux package
       run: |
-        (cd FreeMoteToolkit-Linux && zip -r ../FreeMote-Linux-x64.zip .)
+        (cd FreeMoteToolkit-Linux && zip -r9 ../FreeMote-Linux-x64.zip .)
 
     - name: Upload artifact (Folder)
       uses: actions/upload-artifact@v4
