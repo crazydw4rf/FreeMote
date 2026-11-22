@@ -234,7 +234,7 @@ namespace FreeMote.Psb
                     continue;
                 }
 
-                var fullPath = Path.Combine(baseDir ?? "", resPath.Replace('/', '\\'));
+                var fullPath = Path.Combine(baseDir ?? "", resPath.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar));
                 resMd.Link(fullPath, context);
             }
         }
@@ -270,7 +270,7 @@ namespace FreeMote.Psb
                         {
                             var palFullPath = Path.IsPathRooted(resxResource.Value)
                                 ? resxResource.Value
-                                : Path.Combine(baseDir ?? "", resxResource.Value.Replace('/', '\\'));
+                                : Path.Combine(baseDir ?? "", resxResource.Value.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar));
                             var palRawData = File.ReadAllBytes(palFullPath);
                             foreach (var palResMd in palResMds)
                             {
@@ -298,7 +298,7 @@ namespace FreeMote.Psb
 
                 var fullPath = Path.IsPathRooted(resxResource.Value)
                     ? resxResource.Value
-                    : Path.Combine(baseDir ?? "", resxResource.Value.Replace('/', '\\'));
+                    : Path.Combine(baseDir ?? "", resxResource.Value.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar));
                 resMd.Link(fullPath, context);
             }
         }
@@ -339,7 +339,7 @@ namespace FreeMote.Psb
                     var path = extraResourcesDictionary[key];
                     var fullPath = Path.IsPathRooted(path)
                         ? path
-                        : Path.Combine(baseDir ?? "", path.Replace('/', '\\'));
+                        : Path.Combine(baseDir ?? "", path.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar));
                     if (!File.Exists(fullPath))
                     {
                         return false;

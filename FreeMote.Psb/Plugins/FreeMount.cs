@@ -43,6 +43,12 @@ namespace FreeMote.Plugins
         private int _maxShellSigLength = 4;
 
         private static FreeMount _mount = null;
+#if !NETFRAMEWORK
+        static FreeMount()
+        {
+            FreeMote.Consts.InitUnixDrawingSupport();
+        }
+#endif
         internal static FreeMount _ => _mount ??= new FreeMount();
 
         public static string CurrentPath => Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location) ??

@@ -18,6 +18,9 @@ namespace FreeMote.Tools.PsbDecompile
     {
         static void Main(string[] args)
         {
+#if !NETFRAMEWORK
+            Consts.InitUnixDrawingSupport();
+#endif
             Console.WriteLine("FreeMote PSB Decompiler");
             Console.WriteLine("by Ulysses, wdwxy12345@gmail.com");
             Logger.InitConsole();

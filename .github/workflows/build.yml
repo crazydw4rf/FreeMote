@@ -94,6 +94,7 @@ jobs:
         dotnet publish -c Release -f net8.0 -r linux-x64 FreeMote.Plugins/FreeMote.Plugins.csproj -o ./FreeMoteToolkit-Linux
         dotnet publish -c Release -f net8.0 -r linux-x64 FreeMote.Plugins.x64/FreeMote.Plugins.x64.csproj -o ./FreeMoteToolkit-Linux
         rm -f FreeMoteToolkit-Linux/*.pdb FreeMoteToolkit-Linux/*.xml
+        cp support/linux/System.Drawing.Common.dll FreeMoteToolkit-Linux/
         chmod +x FreeMoteToolkit-Linux/EmtConvert FreeMoteToolkit-Linux/PsbDecompile FreeMoteToolkit-Linux/PsBuild FreeMoteToolkit-Linux/EmtMake
 
     - name: Archive Linux package

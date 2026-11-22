@@ -12,6 +12,32 @@ namespace FreeMote
     /// </summary>
     public static class Consts
     {
+#if !NETFRAMEWORK
+        static Consts()
+        {
+            InitUnixDrawingSupport();
+        }
+
+        public static void InitUnixDrawingSupport()
+        {
+            if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            {
+                System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += (ctx, name) =>
+                {
+                    if (name.Name == "System.Drawing.Common")
+                    {
+                        var dllPath = System.IO.Path.Combine(System.AppContext.BaseDirectory, "System.Drawing.Common.dll");
+                        if (System.IO.File.Exists(dllPath))
+                        {
+                            return ctx.LoadFromAssemblyPath(dllPath);
+                        }
+                    }
+                    return null;
+                };
+            }
+        }
+#endif
+
         /// <summary>
         /// Recyclable MemoryStream Manager, only use it for small streams, otherwise it holds too many memory
         /// </summary>

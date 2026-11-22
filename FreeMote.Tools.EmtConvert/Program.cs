@@ -109,6 +109,9 @@ namespace FreeMote.Tools.EmtConvert
 
         static void Main(string[] args)
         {
+#if !NETFRAMEWORK
+            Consts.InitUnixDrawingSupport();
+#endif
             Console.WriteLine("FreeMote PSB Converter");
             Console.WriteLine("by Ulysses, wdwxy12345@gmail.com");
             Logger.InitConsole();

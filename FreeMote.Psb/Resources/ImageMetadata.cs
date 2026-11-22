@@ -251,6 +251,10 @@ namespace FreeMote.Psb
         /// <param name="context"></param>
         public void Link(string fullPath, FreeMountContext context)
         {
+            if (!string.IsNullOrWhiteSpace(fullPath))
+            {
+                fullPath = fullPath.Replace('\\', '/').Replace('/', Path.DirectorySeparatorChar);
+            }
             if (string.IsNullOrWhiteSpace(fullPath) || !File.Exists(fullPath))
             {
                 if (Consts.StrictMode)
